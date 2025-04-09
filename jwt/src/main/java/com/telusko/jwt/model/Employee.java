@@ -1,8 +1,27 @@
 package com.telusko.jwt.model;
-import jakarta.persistence.*;
+
+
+
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+
+
+
+
+
+
 
 @Entity
-@Table(schema="public",name="employee")
+@Table(name="employee")
 public class Employee {
 	
 	
@@ -12,10 +31,13 @@ public class Employee {
 	private int id;
 	
 	@Column(name="emp_id")
+	@NotBlank(message = "empId is mandatory")
 	private String empId;
 	
 	@Column(name="designation")
+	@NotBlank(message = "designation is mandatory")
 	private  String designation;
+	
 
 	public int getId() {
 		return id;
@@ -59,6 +81,18 @@ public class Employee {
 	}
 	
 
+	public String toJson() {
+		ObjectMapper mapper = new ObjectMapper();
+
+		try {
+			return mapper.writeValueAsString(this);
+		} catch (JsonProcessingException exception) {
+
+			System.out.println("Exception while converting employee object into json String");
+		}
+
+		return "{}";
+	}
 	
 	
 	

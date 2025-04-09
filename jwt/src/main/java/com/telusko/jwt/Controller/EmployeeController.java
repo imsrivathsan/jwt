@@ -1,23 +1,30 @@
 package com.telusko.jwt.Controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.telusko.jwt.model.Employee;
 import com.telusko.jwt.service.EmployeeService;
+import com.telusko.jwt.util.CustomValidation;
 import com.telusko.jwt.util.ServiceException;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/backendapp/api/employee")
@@ -25,7 +32,7 @@ public class EmployeeController {
 
 	@Autowired
 	private EmployeeService service;
-
+	
 	public EmployeeController() {
 
 	}
@@ -53,7 +60,7 @@ public class EmployeeController {
 	}
 
 	@PostMapping(value = "/add/employee", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> add(@RequestBody Employee employee) {
+	public ResponseEntity<?> add(@Valid @RequestBody Employee employee) {
 		try {
 
 			Employee newEmployee = service.add(employee);
@@ -95,5 +102,11 @@ public class EmployeeController {
 			return ResponseEntity.status(exception.getStatus()).body(false);
 		}
 	}
-
+	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public Map<String,String> handleValidationExp(MethodArgumentNotValidException ex)
+	{
+		return CustomValidation.handleValidationExceptions(ex);
+	}
 }
